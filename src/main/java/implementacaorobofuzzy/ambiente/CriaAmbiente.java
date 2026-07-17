@@ -43,33 +43,36 @@ public final class CriaAmbiente {
     }
 
     public void criaBarreirasInternas() {
-        int aberturaAnterior = -1;
+        int larguraAbertura = 3;
+        int aberturaEsquerda = 4;
+        int aberturaDireita = ambiente.length - 7;
+        int colunaPernaEsquerda = aberturaEsquerda - 1;
+        int colunaPernaDireita = aberturaDireita + larguraAbertura;
+        int indiceBarreira = 0;
 
         for (int linha = 6; linha < ambiente.length - 4; linha = linha + 6) {
-            int abertura = sorteiaAbertura(aberturaAnterior);
-            aberturaAnterior = abertura;
-            int larguraAbertura = 3;
+            boolean aberturaNaDireita = indiceBarreira % 2 == 0;
+            int abertura = aberturaNaDireita ? aberturaDireita : aberturaEsquerda;
 
             for (int coluna = 1; coluna < ambiente.length - 1; coluna++) {
                 if (coluna < abertura || coluna >= abertura + larguraAbertura) {
                     ambiente[linha][coluna] = 1;
                 }
             }
+
+            if (indiceBarreira > 0) {
+                int colunaPerna = aberturaNaDireita ? colunaPernaEsquerda : colunaPernaDireita;
+                criaPernaDoL(linha, colunaPerna);
+            }
+
+            indiceBarreira++;
         }
     }
 
-    private int sorteiaAbertura(int aberturaAnterior) {
-        int abertura = 2 + gerador.nextInt(ambiente.length - 6);
-        int tentativas = 0;
-
-        while (aberturaAnterior != -1
-                && Math.abs(abertura - aberturaAnterior) < 10
-                && tentativas < 20) {
-            abertura = 2 + gerador.nextInt(ambiente.length - 6);
-            tentativas++;
+    private void criaPernaDoL(int linhaBase, int coluna) {
+        for (int linha = linhaBase - 5; linha < linhaBase; linha++) {
+            ambiente[linha][coluna] = 1;
         }
-
-        return abertura;
     }
 
     public void imprime() {

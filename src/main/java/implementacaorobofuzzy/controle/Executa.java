@@ -74,9 +74,17 @@ public class Executa {
                 int proximoX = memoria.posicaoAtualX + memoria.direcaoBuscaPorta;
                 if (memoria.sala[memoria.posicaoAtualY][proximoX] == 1) {
                     memoria.direcaoBuscaPorta = memoria.direcaoBuscaPorta * -1;
-                    proximoX = memoria.posicaoAtualX + memoria.direcaoBuscaPorta;
+                    if (memoria.sala[memoria.posicaoAtualY - 1][memoria.posicaoAtualX] != 1) {
+                        movimentoX = 0;
+                        movimentoY = -1;
+                    } else {
+                        proximoX = memoria.posicaoAtualX + memoria.direcaoBuscaPorta;
+                        if (memoria.sala[memoria.posicaoAtualY][proximoX] != 1) {
+                            movimentoX = memoria.direcaoBuscaPorta;
+                        }
+                    }
                 }
-                if (memoria.sala[memoria.posicaoAtualY][proximoX] != 1) {
+                if (movimentoY == 0 && memoria.sala[memoria.posicaoAtualY][proximoX] != 1) {
                     movimentoX = memoria.direcaoBuscaPorta;
                 }
             }

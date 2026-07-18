@@ -75,7 +75,7 @@ mvn clean compile exec:java
 O plugin `exec-maven-plugin` esta configurado para iniciar a classe:
 
 ```text
-implementacaorobofuzzy.app.ClassePrincipal
+implementacaorobofuzzy.app.Main
 ```
 
 ### Gerar o arquivo JAR
@@ -94,7 +94,7 @@ java -jar target/implementacao-robo-fuzzy-1.0.0.jar
 
 ### 1. Inicializacao
 
-A execucao comeca em `ClassePrincipal`, que cria um objeto `Executa` e chama o metodo `executa()`.
+A execucao comeca em `Main`, que cria um objeto `Executa` e chama o metodo `executa()`.
 
 ```java
 Executa executa = new Executa();
@@ -141,7 +141,7 @@ A classe `Fuzzyficacao` converte distancias numericas em graus de pertinencia fu
 - `medio(int a)`
 - `longe(int a)`
 
-A classe `VariaveisLinguisticas` define as faixas linguisticas usadas pelas regras:
+A classe `Fuzzyficacao` define as faixas linguisticas usadas pelas regras:
 
 | Variavel | Regra |
 | --- | --- |

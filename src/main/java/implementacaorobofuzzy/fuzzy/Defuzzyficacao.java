@@ -2,19 +2,26 @@ package implementacaorobofuzzy.fuzzy;
 
 public class Defuzzyficacao {
 
-    public Double moveCurtoY(Double a) {
-        return 2 * a + 1;
+    public double calcLento(double input) {
+        if (input >= 0 && input <= 0.50) {
+            return (0.50 - input) / 0.50;
+        }
+        return 0;
     }
 
-    public Double moveLongoY(Double a) {
-        return 2 * a + 3;
+    public double calcMedio(double input) {
+        if (input >= 0.25 && input <= 0.50) {
+            return (input - 0.25) / 0.25;
+        } else if (input > 0.50 && input <= 0.75) {
+            return (0.75 - input) / 0.25;
+        }
+        return 0;
     }
 
-    public Double moveCurtoX(Double a) {
-        return a;
-    }
-
-    public Double moveLongoX(Double a) {
-        return 1.0;
+    public double calcRapido(double input) {
+        if (input >= 0.50 && input <= 1) {
+            return (input - 0.50) / 0.50;
+        }
+        return 0;
     }
 }

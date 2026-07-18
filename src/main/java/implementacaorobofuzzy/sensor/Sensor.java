@@ -1,63 +1,63 @@
 package implementacaorobofuzzy.sensor;
 
-import implementacaorobofuzzy.ambiente.Memoria;
+import implementacaorobofuzzy.ambiente.Vizinhanca;
 
 public class Sensor {
 
-    public void detecta(Integer posicaoAtualX, Integer posicaoAtualY) {
-        Integer diferencaXp = 0;
-        Integer diferencaXn = 0;
-        Integer diferencaYp = 0;
-        Integer diferencaYn = 0;
+    public LeituraSensor ler(Vizinhanca vizinhanca) {
+        Integer[][] matriz = vizinhanca.getMatriz();
+        int centroY = matriz.length / 2;
+        int centroX = matriz[centroY].length / 2;
 
-        Integer[][] sala = Memoria.sala;
-        Integer distSensor = 6;
+        return new LeituraSensor(
+                distanciaDireita(matriz, centroX, centroY),
+                distanciaEsquerda(matriz, centroX, centroY),
+                distanciaAbaixo(matriz, centroX, centroY),
+                distanciaAcima(matriz, centroX, centroY)
+        );
+    }
 
-        int limiteDireita = Math.min(posicaoAtualX + distSensor, sala[0].length - 1);
-        int limiteEsquerda = Math.max(posicaoAtualX - distSensor, 0);
-        int limiteInferior = Math.min(posicaoAtualY + distSensor, sala.length - 1);
-        int limiteSuperior = Math.max(posicaoAtualY - distSensor, 0);
-
-        for (int i = posicaoAtualX; i <= limiteDireita; i++) {
-            if (sala[posicaoAtualY][i] == 1) {
-                diferencaXp = i - posicaoAtualX - 1;
+    private int distanciaDireita(Integer[][] matriz, int centroX, int centroY) {
+        int distancia = 0;
+        for (int x = centroX + 1; x < matriz[centroY].length; x++) {
+            if (matriz[centroY][x] == 1) {
                 break;
             }
-            if (i == limiteDireita) {
-                diferencaXp = i - posicaoAtualX - 1;
-            }
+            distancia++;
         }
-        for (int i = posicaoAtualY; i <= limiteInferior; i++) {
-            if (sala[i][posicaoAtualX] == 1) {
-                diferencaYn = i - posicaoAtualY - 1;
-                break;
-            }
-            if (i == limiteInferior) {
-                diferencaYn = i - posicaoAtualY - 1;
-            }
-        }
-        for (int i = posicaoAtualX; i >= limiteEsquerda; i--) {
-            if (sala[posicaoAtualY][i] == 1) {
-                diferencaXn = posicaoAtualX - i - 1;
-                break;
-            }
-            if (i == limiteEsquerda) {
-                diferencaXn = posicaoAtualX - i - 1;
-            }
-        }
-        for (int i = posicaoAtualY; i >= limiteSuperior; i--) {
-            if (sala[i][posicaoAtualX] == 1) {
-                diferencaYp = posicaoAtualY - i - 1;
-                break;
-            }
-            if (i == limiteSuperior) {
-                diferencaYp = posicaoAtualY - i - 1;
-            }
-        }
+        return distancia;
+    }
 
-        Memoria.diferencaXp = diferencaXp;
-        Memoria.diferencaXn = diferencaXn;
-        Memoria.diferencaYp = diferencaYp;
-        Memoria.diferencaYn = diferencaYn;
+    private int distanciaEsquerda(Integer[][] matriz, int centroX, int centroY) {
+        int distancia = 0;
+        for (int x = centroX - 1; x >= 0; x--) {
+            if (matriz[centroY][x] == 1) {
+                break;
+            }
+            distancia++;
+        }
+        return distancia;
+    }
+
+    private int distanciaAbaixo(Integer[][] matriz, int centroX, int centroY) {
+        int distancia = 0;
+        for (int y = centroY + 1; y < matriz.length; y++) {
+            if (matriz[y][centroX] == 1) {
+                break;
+            }
+            distancia++;
+        }
+        return distancia;
+    }
+
+    private int distanciaAcima(Integer[][] matriz, int centroX, int centroY) {
+        int distancia = 0;
+        for (int y = centroY - 1; y >= 0; y--) {
+            if (matriz[y][centroX] == 1) {
+                break;
+            }
+            distancia++;
+        }
+        return distancia;
     }
 }

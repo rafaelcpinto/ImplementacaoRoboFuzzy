@@ -2,97 +2,81 @@ package implementacaorobofuzzy.fuzzy;
 
 public class InferenciaFuzzy {
 
-    private static final double PESO_REGRA_MEDIA_PARA_BAIXA = 0.30;
-    private static final double PESO_REGRA_LONGE_PARA_MEDIA = 0.25;
+    private final double perto;
+    private final double medio;
+    private final double longe;
 
-    private final double velocidadeBaixa;
-    private final double velocidadeMedia;
-    private final double velocidadeAlta;
+    private InferenciaFuzzy(Builder builder) {
+        this.perto = builder.perto;
+        this.medio = builder.medio;
+        this.longe = builder.longe;
+    }
 
-    public InferenciaFuzzy(
-            double distanciaPerto,
-            double distanciaMedia,
-            double distanciaLonge
-    ) {
-        validarGrau(distanciaPerto);
-        validarGrau(distanciaMedia);
-        validarGrau(distanciaLonge);
-
-        double regraPertoParaBaixa =
-                aplicarRegra(distanciaPerto);
-
-        double regraMediaParaMedia =
-                aplicarRegra(distanciaMedia);
-
-        double regraLongeParaAlta =
-                aplicarRegra(distanciaLonge);
-
-        double regraMediaParaBaixa =
-                aplicarRegraComPeso(
-                        distanciaMedia,
-                        PESO_REGRA_MEDIA_PARA_BAIXA
-                );
-
-        double regraLongeParaMedia =
-                aplicarRegraComPeso(
-                        distanciaLonge,
-                        PESO_REGRA_LONGE_PARA_MEDIA
-                );
-
-        this.velocidadeBaixa = agregar(
-                regraPertoParaBaixa,
-                regraMediaParaBaixa
+    public Double[][] executar() {
+        double lento = perto;
+        double centroMedio = Math.min(
+                medio,
+                Math.min(1.0 - perto, 1.0 - longe)
         );
 
-        this.velocidadeMedia = agregar(
-                regraMediaParaMedia,
-                regraLongeParaMedia
+        double velocidadeBaixa = Math.max(
+                Math.min(perto, medio),
+                centroMedio
+        );
+        double velocidadeMedia = Math.max(
+                Math.min(medio, longe),
+                centroMedio
         );
 
-        this.velocidadeAlta = regraLongeParaAlta;
+        return new Double[][]{
+                {lento},
+                {velocidadeBaixa},
+                {velocidadeMedia},
+                {longe}
+        };
     }
 
-    private double aplicarRegra(double grauEntrada) {
-        return grauEntrada;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    private double aplicarRegraComPeso(
-            double grauEntrada,
-            double peso
-    ) {
-        validarGrau(peso);
+    public static class Builder {
 
-        return grauEntrada * peso;
-    }
+        private double perto;
+        private double medio;
+        private double longe;
 
-    private double agregar(double... graus) {
-        double maiorGrau = 0.0;
-
-        for (double grau : graus) {
-            validarGrau(grau);
-            maiorGrau = Math.max(maiorGrau, grau);
+        private Builder() {
         }
 
-        return maiorGrau;
-    }
-
-    private void validarGrau(double valor) {
-        if (!Double.isFinite(valor) || valor < 0.0 || valor > 1.0) {
-            throw new IllegalArgumentException(
-                    "O grau de inferência deve estar entre 0 e 1."
-            );
+        public Builder perto(double perto) {
+            validarValor(perto);
+            this.perto = perto;
+            return this;
         }
-    }
 
-    public double getVelocidadeBaixa() {
-        return velocidadeBaixa;
-    }
+        public Builder medio(double medio) {
+            validarValor(medio);
+            this.medio = medio;
+            return this;
+        }
 
-    public double getVelocidadeMedia() {
-        return velocidadeMedia;
-    }
+        public Builder longe(double longe) {
+            validarValor(longe);
+            this.longe = longe;
+            return this;
+        }
 
-    public double getVelocidadeAlta() {
-        return velocidadeAlta;
+        public InferenciaFuzzy build() {
+            return new InferenciaFuzzy(this);
+        }
+
+        private void validarValor(double valor) {
+            if (!Double.isFinite(valor) || valor < 0.0 || valor > 1.0) {
+                throw new IllegalArgumentException(
+                        "O grau de pertinencia deve estar entre 0 e 1."
+                );
+            }
+        }
     }
 }

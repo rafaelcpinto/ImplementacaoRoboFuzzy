@@ -6,17 +6,8 @@ import implementacaorobofuzzy.controle.Movimento;
 import implementacaorobofuzzy.sensor.LeituraSensor;
 
 public class Interface {
-    public void imprimePorta(int valor) {
-        System.out.println("A PORTA ESTA LOCALIZADA NA POSICACAO: " + valor);
-    }
-
     public void imprimePorta(Posicao porta) {
         System.out.println("Porta: (" + porta.getX() + ", " + porta.getY() + ")");
-    }
-
-    public void coordenadas(int valorX, int valorY) {
-        System.out.println("coordenadaX: " + valorX);
-        System.out.println("coordenadaY: " + valorY + "\n");
     }
 
     public void resultado(boolean chegou, int valorX, int valorY) {
@@ -35,24 +26,25 @@ public class Interface {
     }
 
     public void passo(int numero, Deslocamento deslocamento, Posicao posicao,
-                      Movimento.DirecaoBusca direcaoBusca) {
+                      Movimento.DirecaoBusca direcaoBusca, double valorFuzzy) {
         System.out.println("Passo " + numero
-                + " | deslocamento=(" + deslocamento.getX() + ", " + deslocamento.getY() + ")"
+                + " | deslocamento=(" + deslocamento.x() + ", " + deslocamento.y() + ")"
                 + " | posicao=(" + posicao.getX() + ", " + posicao.getY() + ")"
-                + " | busca=" + direcaoBusca);
+                + " | busca=" + direcaoBusca
+                + " | fuzzy=" + valorFuzzy);
     }
 
     public void encontrouBarreira(int passo, Posicao posicao, LeituraSensor leitura,
                                   Movimento.DirecaoBusca direcaoBusca) {
         System.out.println("BARREIRA ENCONTRADA NO PASSO " + passo);
         System.out.println("  Posicao do robo: (" + posicao.getX() + ", " + posicao.getY() + ")");
-        System.out.println("  Sensor: abaixo=" + leitura.getAbaixo()
-                + ", direita=" + leitura.getDireita()
-                + ", esquerda=" + leitura.getEsquerda()
-                + ", acima=" + leitura.getAcima());
+        System.out.println("  Sensor: abaixo=" + leitura.abaixo()
+                + ", direita=" + leitura.direita()
+                + ", esquerda=" + leitura.esquerda()
+                + ", acima=" + leitura.acima());
         System.out.println("  Aberturas visiveis: esquerda="
-                + formataAbertura(leitura.getAberturaEsquerda())
-                + ", direita=" + formataAbertura(leitura.getAberturaDireita()));
+                + formataAbertura(leitura.aberturaEsquerda())
+                + ", direita=" + formataAbertura(leitura.aberturaDireita()));
         System.out.println("  Direcao escolhida para buscar abertura: " + direcaoBusca);
     }
 

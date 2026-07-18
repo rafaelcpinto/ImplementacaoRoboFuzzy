@@ -1,4 +1,4 @@
-package implementacaorobofuzzy.fuzzy.fuzzificacao.functions;
+package implementacaorobofuzzy.fuzzy.functions;
 
 /**
  * Funcao de pertinencia trapezoidal definida pelos pontos a, b, c e d.

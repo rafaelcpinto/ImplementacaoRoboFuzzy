@@ -2,7 +2,7 @@ package implementacaorobofuzzy.ambiente;
 
 public class ConsultaVizinhanca {
 
-    public Vizinhanca consultar(Sala sala, Posicao posicao, int alcance) {
+    public Integer[][] consultar(Sala sala, Posicao posicao, int alcance) {
         Integer[][] matrizSala = sala.getMatriz();
         int tamanho = alcance * 2 + 1;
         Integer[][] matrizVizinhanca = new Integer[tamanho][tamanho];
@@ -20,7 +20,7 @@ public class ConsultaVizinhanca {
             }
         }
 
-        return new Vizinhanca(matrizVizinhanca);
+        return matrizVizinhanca;
     }
 
     private boolean foraDaSala(Integer[][] matrizSala, int x, int y) {

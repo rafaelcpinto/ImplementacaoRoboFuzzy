@@ -1,8 +1,8 @@
 package implementacaorobofuzzy.fuzzy.fuzzificacao;
 
-import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoPertinencia;
-import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTrapezoidal;
-import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTriangular;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoPertinencia;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoTrapezoidal;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoTriangular;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +20,19 @@ class FuncoesPertinenciaTest {
         assertEquals(0.5, funcao.calcular(0.75), 0.0001);
         assertEquals(0.0, funcao.calcular(1.0), 0.0001);
         assertEquals(0.5, funcao.getCentroide(), 0.0001);
+    }
+
+    @Test
+    void deveCalcularFuncoesTriangularesDeOmbro() {
+        FuncaoTriangular funcao1 = new FuncaoTriangular(0.0, 0.0, 0.5);
+        FuncaoTriangular funcao2 = new FuncaoTriangular(0.5, 1.0, 1.0);
+
+        assertEquals(1.0, funcao1.calcular(0.0), 0.0001);
+        assertEquals(0.5, funcao1.calcular(0.25), 0.0001);
+        assertEquals(0.0, funcao1.calcular(0.5), 0.0001);
+        assertEquals(0.0, funcao2.calcular(0.5), 0.0001);
+        assertEquals(0.5, funcao2.calcular(0.75), 0.0001);
+        assertEquals(1.0, funcao2.calcular(1.0), 0.0001);
     }
 
     @Test

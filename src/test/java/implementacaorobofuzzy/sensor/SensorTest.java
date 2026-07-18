@@ -1,6 +1,5 @@
 package implementacaorobofuzzy.sensor;
 
-import implementacaorobofuzzy.ambiente.Vizinhanca;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,20 +8,20 @@ class SensorTest {
 
     @Test
     void deveMedirDistanciasAPartirDaVizinhanca() {
-        Vizinhanca vizinhanca = new Vizinhanca(new Integer[][] {
+        Integer[][] vizinhanca = {
                 {0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0},
                 {0, 0, 9, 2, 0},
                 {0, 0, 0, 0, 0},
                 {0, 0, 1, 0, 0}
-        });
+        };
 
         LeituraSensor leitura = new Sensor().ler(vizinhanca);
 
-        assertEquals(2, leitura.getDireita());
-        assertEquals(2, leitura.getEsquerda());
-        assertEquals(1, leitura.getAbaixo());
-        assertEquals(2, leitura.getAcima());
+        assertEquals(2, leitura.direita());
+        assertEquals(2, leitura.esquerda());
+        assertEquals(1, leitura.abaixo());
+        assertEquals(2, leitura.acima());
     }
 
     @Test
@@ -35,12 +34,12 @@ class SensorTest {
                 {1, 1, 1, 1, 1}
         };
 
-        LeituraSensor leitura = new Sensor().ler(new Vizinhanca(sala));
+        LeituraSensor leitura = new Sensor().ler(sala);
 
-        assertEquals(1, leitura.getDireita());
-        assertEquals(1, leitura.getEsquerda());
-        assertEquals(1, leitura.getAbaixo());
-        assertEquals(1, leitura.getAcima());
+        assertEquals(1, leitura.direita());
+        assertEquals(1, leitura.esquerda());
+        assertEquals(1, leitura.abaixo());
+        assertEquals(1, leitura.acima());
     }
 
     @Test
@@ -53,38 +52,38 @@ class SensorTest {
                 {1, 1, 2, 1, 1}
         };
 
-        LeituraSensor leitura = new Sensor().ler(new Vizinhanca(vizinhanca));
+        LeituraSensor leitura = new Sensor().ler(vizinhanca);
 
-        assertEquals(2, leitura.getAbaixo());
+        assertEquals(2, leitura.abaixo());
     }
 
     @Test
     void deveLocalizarAberturasVisiveisNaBarreiraAbaixo() {
-        Vizinhanca vizinhanca = new Vizinhanca(new Integer[][] {
+        Integer[][] vizinhanca = {
                 {0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0},
                 {0, 1, 1, 1, 0},
                 {0, 0, 0, 0, 0}
-        });
+        };
 
         LeituraSensor leitura = new Sensor().ler(vizinhanca);
 
-        assertEquals(2, leitura.getAberturaEsquerda());
-        assertEquals(2, leitura.getAberturaDireita());
+        assertEquals(2, leitura.aberturaEsquerda());
+        assertEquals(2, leitura.aberturaDireita());
     }
 
     @Test
     void naoDeveProcurarAberturaQuandoCaminhoAbaixoEstaLivre() {
-        Vizinhanca vizinhanca = new Vizinhanca(new Integer[][] {
+        Integer[][] vizinhanca = {
                 {0, 0, 0},
                 {0, 0, 0},
                 {0, 0, 0}
-        });
+        };
 
         LeituraSensor leitura = new Sensor().ler(vizinhanca);
 
-        assertEquals(-1, leitura.getAberturaEsquerda());
-        assertEquals(-1, leitura.getAberturaDireita());
+        assertEquals(-1, leitura.aberturaEsquerda());
+        assertEquals(-1, leitura.aberturaDireita());
     }
 }

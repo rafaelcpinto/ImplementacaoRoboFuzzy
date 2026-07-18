@@ -1,76 +1,52 @@
 package implementacaorobofuzzy.fuzzy;
 
-import implementacaorobofuzzy.fuzzy.dominio.DataIn;
-import implementacaorobofuzzy.fuzzy.dominio.DataOut;
-import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTrapezoidal;
-import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTriangular;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoPertinencia;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoTrapezoidal;
+import implementacaorobofuzzy.fuzzy.functions.FuncaoTriangular;
 
 public class ControleFuzzy {
 
-    private final Fuzzyficacao fuzzyficacao = new Fuzzyficacao();
-    private final Defuzzyficacao defuzzyficacao = new Defuzzyficacao();
-    private final DataIn dataIn = new DataIn();
-    private final DataOut dataOut = new DataOut();
+    private final FuncaoPertinencia entrada1 = new FuncaoTriangular(0.0, 0.0, 0.50);
+    private final FuncaoPertinencia entrada2 = new FuncaoTriangular(0.25, 0.50, 0.75);
+    private final FuncaoPertinencia entrada3 = new FuncaoTriangular(0.50, 1.0, 1.0);
 
-    public ControleFuzzy() {
-        fuzzyficacao.adicionar(
-                dataIn.getPerto().getNome(),
-                new FuncaoTrapezoidal(0.0, 0.0, 0.25, 0.50)
-        );
-        fuzzyficacao.adicionar(
-                dataIn.getMedio().getNome(),
-                new FuncaoTriangular(0.25, 0.50, 0.75)
-        );
-        fuzzyficacao.adicionar(
-                dataIn.getLonge().getNome(),
-                new FuncaoTrapezoidal(0.50, 0.75, 1.0, 1.0)
+    private final FuncaoPertinencia saida1 = new FuncaoTrapezoidal(0.0, 0.0, 0.05, 0.25);
+    private final FuncaoPertinencia saida2 = new FuncaoTriangular(0.05, 0.28, 0.52);
+    private final FuncaoPertinencia saida3 = new FuncaoTriangular(0.38, 0.58, 0.78);
+    private final FuncaoPertinencia saida4 = new FuncaoTrapezoidal(0.65, 0.82, 1.0, 1.0);
+
+    public double calcular(double entrada) {
+        validarEntrada(entrada);
+
+        double grau1 = entrada1.calcular(entrada);
+        double grau2 = entrada2.calcular(entrada);
+        double grau3 = entrada3.calcular(entrada);
+        double grau2Isolado = Math.min(
+                grau2,
+                Math.min(1.0 - grau1, 1.0 - grau3)
         );
 
-        defuzzyficacao.adicionar(
-                dataOut.getLento().getNome(),
-                new FuncaoTrapezoidal(0.0, 0.0, 0.10, 0.30)
-        );
-        defuzzyficacao.adicionar(
-                dataOut.getVelocidadeBaixa().getNome(),
-                new FuncaoTriangular(0.10, 0.35, 0.60)
-        );
-        defuzzyficacao.adicionar(
-                dataOut.getVelocidadeMedia().getNome(),
-                new FuncaoTriangular(0.40, 0.65, 0.90)
-        );
-        defuzzyficacao.adicionar(
-                dataOut.getRapido().getNome(),
-                new FuncaoTrapezoidal(0.70, 0.90, 1.0, 1.0)
-        );
-    }
+        double grauSaida1 = grau1;
+        double grauSaida2 = Math.max(Math.min(grau1, grau2), grau2Isolado);
+        double grauSaida3 = Math.max(Math.min(grau2, grau3), grau2Isolado);
+        double grauSaida4 = grau3;
 
-    public double calcular(double input) {
-        Map<String, Double> valoresFuzzy = fuzzyficacao.calcular(input);
-
-        InferenciaFuzzy inferencia = InferenciaFuzzy.builder()
-                .perto(obterValor(valoresFuzzy, dataIn.getPerto().getNome()))
-                .medio(obterValor(valoresFuzzy, dataIn.getMedio().getNome()))
-                .longe(obterValor(valoresFuzzy, dataIn.getLonge().getNome()))
-                .build();
-
-        Double[][] matrizInferencia = inferencia.executar();
-        List<Double> valoresInferidos = new ArrayList<>();
-        for (Double[] linha : matrizInferencia) {
-            valoresInferidos.add(linha[0]);
+        double somaGraus = grauSaida1 + grauSaida2 + grauSaida3 + grauSaida4;
+        if (somaGraus == 0.0) {
+            return 0.0;
         }
 
-        return defuzzyficacao.calcular(valoresInferidos);
+        double somaPonderada = grauSaida1 * saida1.getCentroide()
+                + grauSaida2 * saida2.getCentroide()
+                + grauSaida3 * saida3.getCentroide()
+                + grauSaida4 * saida4.getCentroide();
+
+        return somaPonderada / somaGraus;
     }
 
-    private double obterValor(Map<String, Double> valores, String nome) {
-        Double valor = valores.get(nome);
-        if (valor == null) {
-            throw new IllegalArgumentException("Valor fuzzy nao encontrado: " + nome);
+    private void validarEntrada(double entrada) {
+        if (!Double.isFinite(entrada) || entrada < 0.0 || entrada > 1.0) {
+            throw new IllegalArgumentException("A entrada deve estar entre 0 e 1.");
         }
-        return valor;
     }
 }

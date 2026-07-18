@@ -1,11 +1,8 @@
 package implementacaorobofuzzy.sensor;
 
-import implementacaorobofuzzy.ambiente.Vizinhanca;
-
 public class Sensor {
 
-    public LeituraSensor ler(Vizinhanca vizinhanca) {
-        Integer[][] matriz = vizinhanca.getMatriz();
+    public LeituraSensor ler(Integer[][] matriz) {
         int centroY = matriz.length / 2;
         int centroX = matriz[centroY].length / 2;
         int[] aberturas = localizaAberturasNaBarreira(matriz, centroX, centroY);

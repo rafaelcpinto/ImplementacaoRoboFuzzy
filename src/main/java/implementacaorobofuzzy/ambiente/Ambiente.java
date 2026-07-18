@@ -5,22 +5,22 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Ambiente {
     private static final int ALCANCE_SENSOR = 50;
     private static final int QUANTIDADE_BARREIRAS = 60;
-    Sala sala;
-    ConsultaVizinhanca cv;
-    Posicao posicao;
-    Posicao porta;
+    final Sala sala;
+    private final ConsultaVizinhanca consultaVizinhanca;
+    private Posicao posicao;
+    private final Posicao porta;
+
     public Ambiente() {
-        sala= new Sala();
-        cv = new ConsultaVizinhanca();
+        sala = new Sala();
+        consultaVizinhanca = new ConsultaVizinhanca();
         posicao = new Posicao(0, 0);
         int posicaoPortaX = ThreadLocalRandom.current().nextInt(sala.getMatriz()[0].length);
         porta = new Posicao(posicaoPortaX, sala.getMatriz().length - 1);
         criaObstaculos();
         sala.getMatriz()[porta.getY()][porta.getX()] = 2;
     }
-    //public Posicao getPosicao() {return posicao;}
-    public ConsultaVizinhanca getCv() {return cv;}
-    public void addDeslocamento(int x, int y){
+
+    public void addDeslocamento(int x, int y) {
         int origemX = posicao.getX();
         int origemY = posicao.getY();
         int destinoX = origemX + x;
@@ -31,7 +31,7 @@ public class Ambiente {
             return;
         }
 
-        this.posicao.addDesloc(x, y);
+        posicao.addDesloc(x, y);
     }
     public boolean chegouNaPorta() {
         return posicao.getX() == porta.getX() && posicao.getY() == porta.getY();
@@ -42,8 +42,8 @@ public class Ambiente {
     public Posicao getPorta() {
         return new Posicao(porta.getX(), porta.getY());
     }
-    public Vizinhanca getVizinhanca(){
-        return cv.consultar(sala,posicao, ALCANCE_SENSOR);
+    public Integer[][] getVizinhanca() {
+        return consultaVizinhanca.consultar(sala, posicao, ALCANCE_SENSOR);
     }
     public int getAlcanceSensor() {
         return ALCANCE_SENSOR;

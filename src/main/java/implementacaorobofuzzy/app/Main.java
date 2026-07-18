@@ -4,7 +4,6 @@ import implementacaorobofuzzy.ambiente.Ambiente;
 import implementacaorobofuzzy.ambiente.Posicao;
 import implementacaorobofuzzy.ambiente.Sala;
 import implementacaorobofuzzy.controle.Deslocamento;
-import implementacaorobofuzzy.controle.DeslocamentosPossiveis;
 import implementacaorobofuzzy.controle.Movimento;
 import implementacaorobofuzzy.fuzzy.ControleFuzzy;
 import implementacaorobofuzzy.sensor.LeituraSensor;
@@ -15,11 +14,11 @@ public class Main {
     private static final int MAXIMO_DE_PASSOS = Sala.TAMANHO_PADRAO * 5;
 
     public static void main(String[] args) {
-        Sensor sensor = new Sensor();
-        ControleFuzzy controleFuzzy = new ControleFuzzy();
-        Ambiente ambiente = new Ambiente();
-        Movimento movimento = new Movimento();
-        Interface interfaceUsuario = new Interface();
+        var sensor = new Sensor();
+        var controleFuzzy = new ControleFuzzy();
+        var ambiente = new Ambiente();
+        var movimento = new Movimento(controleFuzzy, ambiente.getAlcanceSensor());
+        var interfaceUsuario = new Interface();
 
         interfaceUsuario.inicio(ambiente.getPosicao());
         interfaceUsuario.imprimePorta(ambiente.getPorta());
@@ -28,21 +27,8 @@ public class Main {
         for (int passo = 1; passo <= MAXIMO_DE_PASSOS; passo++) {
             LeituraSensor leitura = sensor.ler(ambiente.getVizinhanca());
 
-            int direita =  0;
-            int esquerda = 0;
-            int baixo = leitura.getAbaixo();
-            int cima = leitura.getAcima();
-            if(baixo==0){
-                direita =  leitura.getDireita();
-                esquerda = leitura.getEsquerda();
-            }
-            DeslocamentosPossiveis possiveis = new DeslocamentosPossiveis(
-            calculaDeslocamento(controleFuzzy, direita, ambiente.getAlcanceSensor()),
-            calculaDeslocamento(controleFuzzy, esquerda, ambiente.getAlcanceSensor()),
-            calculaDeslocamento(controleFuzzy, baixo, ambiente.getAlcanceSensor()),
-            calculaDeslocamento(controleFuzzy,cima, ambiente.getAlcanceSensor())
-            );
-            Deslocamento deslocamento = movimento.calcular(leitura, possiveis);
+            int baixo = leitura.abaixo();
+            var deslocamento = movimento.calcular(leitura);
 
             if (baixo == 0 && !desviandoBarreira) {
                 interfaceUsuario.encontrouBarreira(passo, ambiente.getPosicao(), leitura,
@@ -52,20 +38,21 @@ public class Main {
                 desviandoBarreira = false;
             }
 
-            if (deslocamento.getX() == 0 && deslocamento.getY() == 0) {
+            if (deslocamento.x() == 0 && deslocamento.y() == 0) {
                 System.out.println("Robo sem caminho livre.");
                 break;
             }
 
             Posicao posicaoAnterior = ambiente.getPosicao();
-            ambiente.addDeslocamento(deslocamento.getX(), deslocamento.getY());
+            ambiente.addDeslocamento(deslocamento.x(), deslocamento.y());
             Posicao posicaoAtual = ambiente.getPosicao();
-            Deslocamento deslocamentoRealizado = new Deslocamento(
+            var deslocamentoRealizado = new Deslocamento(
                     posicaoAtual.getX() - posicaoAnterior.getX(),
                     posicaoAtual.getY() - posicaoAnterior.getY());
 
             interfaceUsuario.passo(passo, deslocamentoRealizado, posicaoAtual,
-                    movimento.getDirecaoBusca());
+                    movimento.getDirecaoBusca(),
+                    movimento.getUltimoValorFuzzy());
 
             if (ambiente.chegouNaPorta()) {
                 interfaceUsuario.resultado(true,
@@ -75,16 +62,4 @@ public class Main {
         }
     }
 
-    private static int calculaDeslocamento(ControleFuzzy controleFuzzy, int distanciaLivre,
-                                           int alcanceSensor) {
-        if (distanciaLivre <= 0) {
-            return 0;
-        }
-
-        double entradaNormalizada = Math.min(distanciaLivre / (double) alcanceSensor, 1.0);
-        double intensidade = controleFuzzy.calcular(entradaNormalizada);
-        int deslocamento = (int) Math.round(intensidade * alcanceSensor);
-
-        return Math.max(1, Math.min(deslocamento, distanciaLivre));
-    }
 }

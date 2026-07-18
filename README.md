@@ -29,24 +29,24 @@ As responsabilidades são separadas da seguinte forma:
 
 - `Main`: cria os componentes, coordena cada passo e repassa os resultados.
 - `Ambiente`: conhece a sala, a posição do robô e a porta; fornece a vizinhança local e aplica deslocamentos.
-- `Sensor`: recebe somente uma `Vizinhanca`; não conhece o ambiente nem a posição global do robô.
+- `Sensor`: recebe somente a matriz da vizinhança; não conhece o ambiente nem a posição global do robô.
 - `ControleFuzzy`: transforma uma distância normalizada em intensidade de movimento.
-- `Movimento`: escolhe o eixo e o sentido do movimento; memoriza somente a última direção de busca lateral.
+- `Movimento`: escolhe a direção, aplica a saída fuzzy ao deslocamento e memoriza a direção de busca lateral.
 - `Interface`: imprime porta, barreiras encontradas, passos e resultado final.
 
 Fluxo de um passo:
 
 ```text
-Ambiente fornece Vizinhanca
+Ambiente fornece a matriz local
           |
           v
 Sensor produz LeituraSensor
           |
           v
-Main calcula deslocamentos com ControleFuzzy
+Movimento usa ControleFuzzy
           |
           v
-Movimento escolhe um Deslocamento
+Movimento produz um Deslocamento
           |
           v
 Ambiente aplica o deslocamento
@@ -78,27 +78,28 @@ entrada = min(distanciaLivre / 50, 1)
 
 ### Fuzzyficação
 
-`Fuzzyficacao` calcula os graus de pertinência:
+`ControleFuzzy` calcula diretamente os graus de pertinência:
 
-- `perto`: pertinência máxima entre `0` e `0,25`, decrescendo até `0,50`;
-- `medio`: função triangular entre `0,25` e `0,75`;
-- `longe`: função crescente entre `0,50` e `0,75`, com pertinência máxima até `1`.
+- `entrada1`: função triangular de ombro entre `0` e `0,50`, com pertinência máxima em `0`;
+- `entrada2`: função triangular entre `0,25` e `0,75`;
+- `entrada3`: função triangular de ombro entre `0,50` e `1`, com pertinência máxima em `1`.
 
 ### Inferência
 
-`InferenciaFuzzy` valida os graus, aplica cinco regras de velocidade e agrega regras com o mesmo consequente usando `max`. Distância perto ativa velocidade baixa; distância média ativa velocidade média e, com peso limitado a `0,30`, também velocidade baixa; distância longe ativa velocidade alta e, com peso limitado a `0,25`, também velocidade média.
+As regras ficam no próprio `ControleFuzzy` e produzem quatro graus genéricos: `saida1`, `saida2`, `saida3` e `saida4`. As transições entre conjuntos adjacentes usam `min` e `max`.
 
 ### Centro de gravidade
 
-Cada função de pertinência calcula seu próprio centroide. `ControleFuzzy` passa os mesmos objetos para `Fuzzyficacao` e repassa seus centroides ao construtor de `Defuzzyficacao`. O método `calcular` recebe os graus agregados e calcula a velocidade final usando a média ponderada:
+Cada função de saída calcula seu centroide. `ControleFuzzy` calcula a velocidade final pela média ponderada dos quatro graus:
 
 | Conjunto | Centro |
 | --- | --- |
-| Perto | `0,1944` |
-| Médio | `0,5000` |
-| Longe | `0,8056` |
+| Saída 1 | `0,0861` |
+| Saída 2 | `0,2833` |
+| Saída 3 | `0,5800` |
+| Saída 4 | `0,8630` |
 
-A intensidade resultante é multiplicada pela distância livre. O deslocamento final é arredondado, tem no mínimo uma célula quando existe caminho e nunca ultrapassa a distância medida pelo sensor.
+A saída fuzzy é multiplicada pelo alcance do sensor para definir o deslocamento em qualquer direção. O resultado é arredondado, tem o mínimo de uma célula quando há caminho livre e nunca ultrapassa a quantidade de células livres medida pelo sensor.
 
 ## Regras de movimento
 
@@ -127,7 +128,7 @@ BARREIRA ENCONTRADA NO PASSO 5
   Sensor: abaixo=0, direita=10, esquerda=0, acima=10
   Aberturas visiveis: esquerda=nao encontrada, direita=9
   Direcao escolhida para buscar abertura: DIREITA
-Passo 5 | deslocamento=(8, 0) | posicao=(8, 17) | busca=DIREITA
+Passo 5 | deslocamento=(8, 0) | posicao=(8, 17) | busca=DIREITA | fuzzy=0.16
 ...
 O ROBO CHEGOU NA PORTA.
 posicaoFinalX: 31
@@ -145,21 +146,18 @@ src
 |   |   |-- Ambiente.java
 |   |   |-- ConsultaVizinhanca.java
 |   |   |-- Posicao.java
-|   |   |-- Sala.java
-|   |   `-- Vizinhanca.java
+|   |   `-- Sala.java
 |   |-- app
 |   |   `-- Main.java
 |   |-- controle
 |   |   |-- Deslocamento.java
-|   |   |-- DeslocamentosPossiveis.java
-|   |   |-- Executa.java
 |   |   `-- Movimento.java
 |   |-- fuzzy
-|   |   |-- CalculaCentroDeGravidade.java
 |   |   |-- ControleFuzzy.java
-|   |   |-- Defuzzyficacao.java
-|   |   |-- Fuzzyficacao.java
-|   |   `-- InferenciaFuzzy.java
+|   |   `-- functions
+|   |       |-- FuncaoPertinencia.java
+|   |       |-- FuncaoTrapezoidal.java
+|   |       `-- FuncaoTriangular.java
 |   |-- sensor
 |   |   |-- LeituraSensor.java
 |   |   `-- Sensor.java
@@ -174,7 +172,7 @@ src
 
 ## Requisitos
 
-- JDK 8 ou superior
+- JDK 21 ou superior
 - Maven
 
 ## Execução
@@ -208,6 +206,6 @@ A suíte cobre:
 - varredura de aberturas visíveis nas barreiras;
 - escolha e inversão da direção de movimento;
 - funções de pertinência;
-- inferência fuzzy;
-- cálculo do centro de gravidade;
+- validação, inferência e defuzzyficação do controlador fuzzy;
+- cálculo dos centroides das funções de pertinência;
 - detecção de chegada e passagem pela porta.

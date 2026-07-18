@@ -8,14 +8,10 @@ class InferenciaFuzzyRegrasTest {
 
     @Test
     void deveAplicarRegrasDeVelocidade() {
-        InferenciaFuzzy inferencia = InferenciaFuzzy.builder()
-                .entradaBaixa(0.8)
-                .entradaMedia(0.3)
-                .entradaAlta(0.0)
-                .build();
+        InferenciaFuzzy inferencia = new InferenciaFuzzy(0.8, 0.3, 0.0);
 
-        assertEquals(0.8, inferencia.getBaixa(), 0.0001);
-        assertEquals(0.3, inferencia.getMedia(), 0.0001);
-        assertEquals(0.0, inferencia.getAlta(), 0.0001);
+        assertEquals(0.8, inferencia.getVelocidadeBaixa(), 0.0001);
+        assertEquals(0.3, inferencia.getVelocidadeMedia(), 0.0001);
+        assertEquals(0.0, inferencia.getVelocidadeAlta(), 0.0001);
     }
 }

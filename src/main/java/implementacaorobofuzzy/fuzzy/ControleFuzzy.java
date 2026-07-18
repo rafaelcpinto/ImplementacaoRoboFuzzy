@@ -2,23 +2,22 @@ package implementacaorobofuzzy.fuzzy;
 
 public class ControleFuzzy {
 
-    private final Fuzzyficacao fuzzy = new Fuzzyficacao();
+    private final Fuzzyficacao fuzzyficacao;
+    private final Defuzzyficacao defuzzyficacao;
 
-    public double Calcula(Double input) {
-        InferenciaFuzzy inferencia = InferenciaFuzzy.builder()
-                .entradaBaixa(fuzzy.calcPerto(input))
-                .entradaMedia(fuzzy.calcMedio(input))
-                .entradaAlta(fuzzy.calcLonge(input))
-                .build();
+    public ControleFuzzy() {
+        this.fuzzyficacao = new Fuzzyficacao();
+        this.defuzzyficacao = new Defuzzyficacao();
+    }
 
-        CalculaCentroDeGravidade centroDeGravidade = CalculaCentroDeGravidade.builder()
-                .perto(inferencia.getBaixa())
-                .medio(inferencia.getMedia())
-                .longe(inferencia.getAlta())
-                .build();
+    public double calcular(double input) {
 
-        double velocidade = centroDeGravidade.getValue();
+        double perto = fuzzyficacao.calcPerto(input);
+        double medio = fuzzyficacao.calcMedio(input);
+        double longe = fuzzyficacao.calcLonge(input);
 
-        return velocidade;
+        InferenciaFuzzy inferencia = new InferenciaFuzzy(perto, medio, longe);
+
+        return defuzzyficacao.calcular(inferencia);
     }
 }

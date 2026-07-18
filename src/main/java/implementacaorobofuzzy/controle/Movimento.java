@@ -10,6 +10,8 @@ public class Movimento {
             return new Deslocamento(0, possiveis.getAbaixo());
         }
 
+        escolheDirecaoDaAbertura(leitura);
+
         if (direcaoBusca == DirecaoBusca.DIREITA && leitura.getDireita() == 0) {
             direcaoBusca = DirecaoBusca.ESQUERDA;
         } else if (direcaoBusca == DirecaoBusca.ESQUERDA && leitura.getEsquerda() == 0) {
@@ -25,6 +27,17 @@ public class Movimento {
         }
 
         return new Deslocamento(0, 0);
+    }
+
+    private void escolheDirecaoDaAbertura(LeituraSensor leitura) {
+        int esquerda = leitura.getAberturaEsquerda();
+        int direita = leitura.getAberturaDireita();
+
+        if (esquerda >= 0 && (direita < 0 || esquerda < direita)) {
+            direcaoBusca = DirecaoBusca.ESQUERDA;
+        } else if (direita >= 0 && (esquerda < 0 || direita < esquerda)) {
+            direcaoBusca = DirecaoBusca.DIREITA;
+        }
     }
 
     public DirecaoBusca getDirecaoBusca() {

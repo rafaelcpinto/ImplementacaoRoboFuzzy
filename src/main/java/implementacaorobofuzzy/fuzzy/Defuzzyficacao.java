@@ -2,26 +2,12 @@ package implementacaorobofuzzy.fuzzy;
 
 public class Defuzzyficacao {
 
-    public double calcLento(double input) {
-        if (input >= 0 && input <= 0.50) {
-            return (0.50 - input) / 0.50;
-        }
-        return 0;
-    }
-
-    public double calcMedio(double input) {
-        if (input >= 0.25 && input <= 0.50) {
-            return (input - 0.25) / 0.25;
-        } else if (input > 0.50 && input <= 0.75) {
-            return (0.75 - input) / 0.25;
-        }
-        return 0;
-    }
-
-    public double calcRapido(double input) {
-        if (input >= 0.50 && input <= 1) {
-            return (input - 0.50) / 0.50;
-        }
-        return 0;
+    public double calcular(InferenciaFuzzy inferencia) {
+        return CalculaCentroDeGravidade.builder()
+                .perto(inferencia.getVelocidadeBaixa())
+                .medio(inferencia.getVelocidadeMedia())
+                .longe(inferencia.getVelocidadeAlta())
+                .build()
+                .getValue();
     }
 }

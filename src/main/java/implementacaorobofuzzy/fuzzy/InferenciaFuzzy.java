@@ -1,71 +1,97 @@
 package implementacaorobofuzzy.fuzzy;
 
 public class InferenciaFuzzy {
-    private final double baixa;
-    private final double media;
-    private final double alta;
 
-    private InferenciaFuzzy(Builder builder) {
-        this.baixa = builder.baixa;
-        this.media = builder.media;
-        this.alta = builder.alta;
+    private final double velocidadeBaixa;
+    private final double velocidadeMedia;
+    private final double velocidadeAlta;
+
+    public InferenciaFuzzy(
+            double distanciaPerto,
+            double distanciaMedia,
+            double distanciaLonge
+    ) {
+        distanciaPerto = validaGrau(distanciaPerto);
+        distanciaMedia = validaGrau(distanciaMedia);
+        distanciaLonge = validaGrau(distanciaLonge);
+
+        double regra1 = regraDistanciaPerto(distanciaPerto);
+        double regra2 = regraDistanciaMedia(distanciaMedia);
+        double regra3 = regraDistanciaLonge(distanciaLonge);
+
+        double regra4 = regraMediaTambemReduzVelocidade(distanciaMedia);
+        double regra5 = regraLongeTambemPermiteVelocidadeMedia(distanciaLonge);
+
+        this.velocidadeBaixa = Math.max(regra1, regra4);
+        this.velocidadeMedia = Math.max(regra2, regra5);
+        this.velocidadeAlta = regra3;
     }
 
-    public double getBaixa() {
-        return baixa;
+    /*
+     * R1:
+     * SE distância é PERTO
+     * ENTÃO velocidade é BAIXA
+     */
+    private double regraDistanciaPerto(double distanciaPerto) {
+        return distanciaPerto;
     }
 
-    public double getMedia() {
-        return media;
+    /*
+     * R2:
+     * SE distância é MÉDIA
+     * ENTÃO velocidade é MÉDIA
+     */
+    private double regraDistanciaMedia(double distanciaMedia) {
+        return distanciaMedia;
     }
 
-    public double getAlta() {
-        return alta;
+    /*
+     * R3:
+     * SE distância é LONGE
+     * ENTÃO velocidade é ALTA
+     */
+    private double regraDistanciaLonge(double distanciaLonge) {
+        return distanciaLonge;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    /*
+     * R4:
+     * SE distância é MÉDIA
+     * ENTÃO velocidade é BAIXA
+     *
+     * Essa regra tem peso 0.30.
+     */
+    private double regraMediaTambemReduzVelocidade(double distanciaMedia) {
+        return Math.min(distanciaMedia, 0.30);
     }
 
-    public static class Builder {
-        private double entradaBaixa;
-        private double entradaMedia;
-        private double entradaAlta;
-        private double baixa;
-        private double media;
-        private double alta;
+    /*
+     * R5:
+     * SE distância é LONGE
+     * ENTÃO velocidade é MÉDIA
+     *
+     * Essa regra tem peso 0.25.
+     */
+    private double regraLongeTambemPermiteVelocidadeMedia(double distanciaLonge) {
+        return Math.min(distanciaLonge, 0.25);
+    }
 
-        public Builder entradaBaixa(double entradaBaixa) {
-            this.entradaBaixa = validaGrau(entradaBaixa);
-            return this;
+    private double validaGrau(double valor) {
+        if (!Double.isFinite(valor) || valor < 0 || valor > 1) {
+            throw new IllegalArgumentException("O grau de inferencia deve estar entre 0 e 1.");
         }
+        return valor;
+    }
 
-        public Builder entradaMedia(double entradaMedia) {
-            this.entradaMedia = validaGrau(entradaMedia);
-            return this;
-        }
+    public double getVelocidadeBaixa() {
+        return velocidadeBaixa;
+    }
 
-        public Builder entradaAlta(double entradaAlta) {
-            this.entradaAlta = validaGrau(entradaAlta);
-            return this;
-        }
+    public double getVelocidadeMedia() {
+        return velocidadeMedia;
+    }
 
-        public InferenciaFuzzy build() {
-            aplicaRegras();
-            return new InferenciaFuzzy(this);
-        }
-
-        private void aplicaRegras() {
-            baixa = entradaBaixa;
-            media = entradaMedia;
-            alta = entradaAlta;
-        }
-
-        private double validaGrau(double valor) {
-            if (valor < 0 || valor > 1) {
-                throw new IllegalArgumentException("O grau de inferencia deve estar entre 0 e 1.");
-            }
-            return valor;
-        }
+    public double getVelocidadeAlta() {
+        return velocidadeAlta;
     }
 }

@@ -3,6 +3,8 @@ package implementacaorobofuzzy.ambiente;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Ambiente {
+    private static final int ALCANCE_SENSOR = 50;
+    private static final int QUANTIDADE_BARREIRAS = 60;
     Sala sala;
     ConsultaVizinhanca cv;
     Posicao posicao;
@@ -41,7 +43,10 @@ public class Ambiente {
         return new Posicao(porta.getX(), porta.getY());
     }
     public Vizinhanca getVizinhanca(){
-        return cv.consultar(sala,posicao,10);
+        return cv.consultar(sala,posicao, ALCANCE_SENSOR);
+    }
+    public int getAlcanceSensor() {
+        return ALCANCE_SENSOR;
     }
 
     private boolean passaPelaPorta(int origemX, int origemY, int destinoX, int destinoY) {
@@ -60,18 +65,17 @@ public class Ambiente {
     }
 
     private void criaObstaculos() {
-        int[][] faixasDeLinhas = {
-                {6, 12},
-                {14, 20},
-                {22, 28},
-                {30, 36},
-                {38, 44}
-        };
-        int larguraAbertura = 11;
+        int larguraAbertura = ALCANCE_SENSOR + 1;
         int larguraSala = sala.getMatriz()[0].length;
+        int alturaSala = sala.getMatriz().length;
+        int distanciaEntreBarreiras = alturaSala / (QUANTIDADE_BARREIRAS + 1);
+        int variacaoLinha = Math.max(1, distanciaEntreBarreiras / 3);
 
-        for (int[] faixa : faixasDeLinhas) {
-            int linha = ThreadLocalRandom.current().nextInt(faixa[0], faixa[1] + 1);
+        for (int numero = 1; numero <= QUANTIDADE_BARREIRAS; numero++) {
+            int linhaCentral = numero * distanciaEntreBarreiras;
+            int linhaMinima = Math.max(1, linhaCentral - variacaoLinha);
+            int linhaMaxima = Math.min(alturaSala - 2, linhaCentral + variacaoLinha);
+            int linha = ThreadLocalRandom.current().nextInt(linhaMinima, linhaMaxima + 1);
             int inicioAbertura = ThreadLocalRandom.current()
                     .nextInt(larguraSala - larguraAbertura + 1);
             criaBarreiraHorizontal(linha, inicioAbertura, larguraAbertura);

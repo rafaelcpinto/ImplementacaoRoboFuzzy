@@ -11,8 +11,9 @@ class AmbienteTest {
         Ambiente ambiente = new Ambiente();
         Posicao porta = ambiente.getPorta();
 
-        org.junit.jupiter.api.Assertions.assertTrue(porta.getX() >= 0 && porta.getX() < 50);
-        assertEquals(49, porta.getY());
+        org.junit.jupiter.api.Assertions.assertTrue(
+                porta.getX() >= 0 && porta.getX() < Sala.TAMANHO_PADRAO);
+        assertEquals(Sala.TAMANHO_PADRAO - 1, porta.getY());
         assertEquals(2, ambiente.sala.getMatriz()[porta.getY()][porta.getX()]);
     }
 
@@ -29,13 +30,13 @@ class AmbienteTest {
     @Test
     void devePararNaPortaQuandoDeslocamentoPassaPorEla() {
         Ambiente ambiente = new Ambiente();
-        ambiente.addDeslocamento(0, 49);
+        ambiente.addDeslocamento(0, Sala.TAMANHO_PADRAO - 1);
 
-        ambiente.addDeslocamento(49, 0);
+        ambiente.addDeslocamento(Sala.TAMANHO_PADRAO - 1, 0);
 
         assertEquals(true, ambiente.chegouNaPorta());
         assertEquals(ambiente.getPorta().getX(), ambiente.getPosicao().getX());
-        assertEquals(49, ambiente.getPosicao().getY());
+        assertEquals(Sala.TAMANHO_PADRAO - 1, ambiente.getPosicao().getY());
     }
 
     @Test
@@ -57,11 +58,11 @@ class AmbienteTest {
 
             if (obstaculos > 0) {
                 quantidadeBarreiras++;
-                assertEquals(39, obstaculos);
-                assertEquals(11, espacosLivres);
+                assertEquals(949, obstaculos);
+                assertEquals(51, espacosLivres);
             }
         }
 
-        assertEquals(5, quantidadeBarreiras);
+        assertEquals(60, quantidadeBarreiras);
     }
 }

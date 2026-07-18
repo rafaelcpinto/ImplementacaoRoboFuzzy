@@ -15,7 +15,7 @@ class CalculaCentroDeGravidadeTest {
                 .longe(0.0)
                 .getCentroGravidade();
 
-        assertEquals(0.3571571428, centro, 0.0001);
+        assertEquals(0.3690285714, centro, 0.0001);
     }
 
     @Test
@@ -27,7 +27,7 @@ class CalculaCentroDeGravidadeTest {
                 .build()
                 .getValue();
 
-        assertEquals(0.3571571428, centro, 0.0001);
+        assertEquals(0.3690285714, centro, 0.0001);
     }
 
     @Test

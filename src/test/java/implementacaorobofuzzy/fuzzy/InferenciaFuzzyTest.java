@@ -11,7 +11,7 @@ class InferenciaFuzzyTest {
     void deveCriarInferenciaEAgregarAsRegras() {
         InferenciaFuzzy inferencia = new InferenciaFuzzy(0.2, 0.7, 0.1);
 
-        assertEquals(0.3, inferencia.getVelocidadeBaixa(), 0.0001);
+        assertEquals(0.21, inferencia.getVelocidadeBaixa(), 0.0001);
         assertEquals(0.7, inferencia.getVelocidadeMedia(), 0.0001);
         assertEquals(0.1, inferencia.getVelocidadeAlta(), 0.0001);
     }

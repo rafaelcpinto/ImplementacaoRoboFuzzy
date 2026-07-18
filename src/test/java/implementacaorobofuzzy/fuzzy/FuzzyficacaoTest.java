@@ -11,7 +11,7 @@ class FuzzyficacaoTest {
     @Test
     void deveCalcularPerto() {
         assertEquals(1.0, fuzzyficacao.calcPerto(0), 0.0001);
-        assertEquals(0.5, fuzzyficacao.calcPerto(0.25), 0.0001);
+        assertEquals(1.0, fuzzyficacao.calcPerto(0.25), 0.0001);
         assertEquals(0.0, fuzzyficacao.calcPerto(0.50), 0.0001);
     }
 
@@ -25,7 +25,7 @@ class FuzzyficacaoTest {
     @Test
     void deveCalcularLonge() {
         assertEquals(0.0, fuzzyficacao.calcLonge(0.50), 0.0001);
-        assertEquals(0.5, fuzzyficacao.calcLonge(0.75), 0.0001);
+        assertEquals(1.0, fuzzyficacao.calcLonge(0.75), 0.0001);
         assertEquals(1.0, fuzzyficacao.calcLonge(1.0), 0.0001);
     }
 }

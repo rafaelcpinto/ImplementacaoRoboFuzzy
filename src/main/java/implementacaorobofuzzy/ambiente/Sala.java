@@ -1,11 +1,12 @@
 package implementacaorobofuzzy.ambiente;
 
 public final class Sala {
+    public static final int TAMANHO_PADRAO = 1000;
 
     private final Integer[][] matriz;
 
     public Sala() {
-        this(50, 50);
+        this(TAMANHO_PADRAO, TAMANHO_PADRAO);
     }
 
     public Sala(int linhas, int colunas) {

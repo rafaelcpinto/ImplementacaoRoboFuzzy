@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este projeto simula um robô que procura uma porta em uma sala 50 x 50. O robô enxerga somente uma vizinhança local, usa lógica fuzzy para calcular o tamanho dos deslocamentos e desvia de barreiras buscando aberturas lateralmente.
+Este projeto simula um robô que procura uma porta em uma sala 1.000 x 1.000. O robô enxerga somente uma vizinhança local, usa lógica fuzzy para calcular o tamanho dos deslocamentos e desvia de barreiras buscando aberturas lateralmente.
 
 ## Representação do ambiente
 
@@ -14,14 +14,14 @@ A sala é representada por uma matriz de inteiros:
 | `1` | Obstáculo |
 | `2` | Porta |
 
-O robô começa em `(0, 0)`. A porta é criada em uma posição `X` aleatória da última linha (`Y = 49`). Os limites externos da matriz são apresentados ao sensor como obstáculos virtuais.
+O robô começa em `(0, 0)`. A porta é criada em uma posição `X` aleatória da última linha (`Y = 999`). Os limites externos da matriz são apresentados ao sensor como obstáculos virtuais.
 
-O ambiente gera cinco barreiras horizontais. Cada barreira:
+O ambiente gera 60 barreiras horizontais. Cada barreira:
 
 - fica em uma faixa de linhas diferente;
 - possui linha aleatória dentro da sua faixa;
 - possui uma abertura horizontal aleatória;
-- deixa 11 células livres, largura compatível com o alcance máximo do sensor.
+- deixa 51 células livres, largura compatível com o alcance máximo do sensor.
 
 ## Arquitetura
 
@@ -57,7 +57,7 @@ Interface exibe o resultado do passo
 
 ## Sensor
 
-O ambiente fornece uma vizinhança com alcance 10 ao redor do robô. O sensor mede quantas células livres existem nas quatro direções:
+O ambiente fornece uma vizinhança com alcance 50 ao redor do robô. O sensor mede quantas células livres existem nas quatro direções:
 
 - direita;
 - esquerda;
@@ -73,16 +73,16 @@ Quando existe uma barreira imediatamente abaixo, o sensor também varre a linha 
 As distâncias são limitadas ao alcance do sensor e normalizadas para o intervalo `[0, 1]`:
 
 ```text
-entrada = min(distanciaLivre / 10, 1)
+entrada = min(distanciaLivre / 50, 1)
 ```
 
 ### Fuzzyficação
 
 `Fuzzyficacao` calcula os graus de pertinência:
 
-- `perto`: função decrescente entre `0` e `0,50`;
+- `perto`: pertinência máxima entre `0` e `0,25`, decrescendo até `0,50`;
 - `medio`: função triangular entre `0,25` e `0,75`;
-- `longe`: função crescente entre `0,50` e `1`.
+- `longe`: função crescente entre `0,50` e `0,75`, com pertinência máxima até `1`.
 
 ### Inferência
 
@@ -94,9 +94,9 @@ entrada = min(distanciaLivre / 10, 1)
 
 | Conjunto | Centro |
 | --- | --- |
-| Perto | `0,1667` |
+| Perto | `0,1944` |
 | Médio | `0,5000` |
-| Longe | `0,8333` |
+| Longe | `0,8056` |
 
 A intensidade resultante é multiplicada pela distância livre. O deslocamento final é arredondado, tem no mínimo uma célula quando existe caminho e nunca ultrapassa a distância medida pelo sensor.
 
@@ -112,7 +112,7 @@ A intensidade resultante é multiplicada pela distância livre. O deslocamento f
 
 Quando um deslocamento longo atravessa a porta, o ambiente interrompe o movimento exatamente na posição dela. O console mostra o deslocamento realmente realizado, não apenas o valor inicialmente solicitado.
 
-O laço atual permite até 100 passos (`MAXIMO_DE_PASSOS`).
+O laço permite até cinco vezes o tamanho padrão da sala, atualmente 5.000 passos.
 
 ## Saída no console
 

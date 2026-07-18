@@ -57,4 +57,34 @@ class SensorTest {
 
         assertEquals(2, leitura.getAbaixo());
     }
+
+    @Test
+    void deveLocalizarAberturasVisiveisNaBarreiraAbaixo() {
+        Vizinhanca vizinhanca = new Vizinhanca(new Integer[][] {
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0},
+                {0, 1, 1, 1, 0},
+                {0, 0, 0, 0, 0}
+        });
+
+        LeituraSensor leitura = new Sensor().ler(vizinhanca);
+
+        assertEquals(2, leitura.getAberturaEsquerda());
+        assertEquals(2, leitura.getAberturaDireita());
+    }
+
+    @Test
+    void naoDeveProcurarAberturaQuandoCaminhoAbaixoEstaLivre() {
+        Vizinhanca vizinhanca = new Vizinhanca(new Integer[][] {
+                {0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 0}
+        });
+
+        LeituraSensor leitura = new Sensor().ler(vizinhanca);
+
+        assertEquals(-1, leitura.getAberturaEsquerda());
+        assertEquals(-1, leitura.getAberturaDireita());
+    }
 }

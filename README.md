@@ -66,6 +66,8 @@ O ambiente fornece uma vizinhança com alcance 10 ao redor do robô. O sensor me
 
 A porta (`2`) é tratada como caminho livre. Somente obstáculos (`1`) interrompem uma medição.
 
+Quando existe uma barreira imediatamente abaixo, o sensor também varre a linha seguinte dentro da vizinhança e informa a distância das aberturas visíveis à esquerda e à direita. Ele continua sem conhecer a posição global ou a matriz completa da sala.
+
 ## Controle fuzzy
 
 As distâncias são limitadas ao alcance do sensor e normalizadas para o intervalo `[0, 1]`:
@@ -84,11 +86,11 @@ entrada = min(distanciaLivre / 10, 1)
 
 ### Inferência
 
-`InferenciaFuzzy` valida os graus e atualmente transfere os graus de entrada para as saídas baixa, média e alta. A classe está preparada para receber uma base de regras mais elaborada futuramente.
+`InferenciaFuzzy` valida os graus, aplica cinco regras de velocidade e agrega regras com o mesmo consequente usando `max`. Distância perto ativa velocidade baixa; distância média ativa velocidade média e, com peso limitado a `0,30`, também velocidade baixa; distância longe ativa velocidade alta e, com peso limitado a `0,25`, também velocidade média.
 
 ### Centro de gravidade
 
-`CalculaCentroDeGravidade` usa uma média ponderada com os centros:
+`Defuzzyficacao` recebe a inferência agregada e a repassa para `CalculaCentroDeGravidade`, que usa uma média ponderada com os centros:
 
 | Conjunto | Centro |
 | --- | --- |
@@ -101,15 +103,16 @@ A intensidade resultante é multiplicada pela distância livre. O deslocamento f
 ## Regras de movimento
 
 1. Se existe caminho abaixo, o robô desce.
-2. Se existe obstáculo imediatamente abaixo, o robô procura uma abertura lateralmente.
-3. A busca começa para a direita.
-4. Ao encontrar obstáculo no sentido lateral atual, o robô inverte a busca.
-5. Se abaixo e os dois lados estão bloqueados, o robô tenta subir.
-6. A direção de busca permanece armazenada mesmo enquanto o robô está descendo.
+2. Se existe obstáculo imediatamente abaixo, o robô procura aberturas visíveis nos dois lados.
+3. Se existe uma abertura visível, escolhe a mais próxima.
+4. Em caso de empate ou quando nenhuma abertura está visível, usa a direção de busca armazenada.
+5. Ao encontrar obstáculo no sentido lateral atual, o robô inverte a busca.
+6. Se abaixo e os dois lados estão bloqueados, o robô tenta subir.
+7. A direção de busca permanece armazenada mesmo enquanto o robô está descendo.
 
 Quando um deslocamento longo atravessa a porta, o ambiente interrompe o movimento exatamente na posição dela. O console mostra o deslocamento realmente realizado, não apenas o valor inicialmente solicitado.
 
-O laço atual permite até 200 passos (`2 * MAXIMO_DE_PASSOS`). Depois do passo 100, o `Main` contém uma inversão experimental dos valores usados para cima e para baixo. Essa lógica não constitui ainda um modo completo de saída de becos sem saída.
+O laço atual permite até 100 passos (`MAXIMO_DE_PASSOS`).
 
 ## Saída no console
 
@@ -122,6 +125,7 @@ Porta: (31, 49)
 BARREIRA ENCONTRADA NO PASSO 5
   Posicao do robo: (0, 17)
   Sensor: abaixo=0, direita=10, esquerda=0, acima=10
+  Aberturas visiveis: esquerda=nao encontrada, direita=9
   Direcao escolhida para buscar abertura: DIREITA
 Passo 5 | deslocamento=(8, 0) | posicao=(8, 17) | busca=DIREITA
 ...
@@ -201,6 +205,7 @@ A suíte cobre:
 - criação da porta e das barreiras;
 - consulta da vizinhança nos limites da sala;
 - leitura do sensor;
+- varredura de aberturas visíveis nas barreiras;
 - escolha e inversão da direção de movimento;
 - funções de pertinência;
 - inferência fuzzy;

@@ -81,7 +81,7 @@ public class Main {
         }
 
         double entradaNormalizada = Math.min(distanciaLivre / ALCANCE_SENSOR, 1.0);
-        double intensidade = controleFuzzy.Calcula(entradaNormalizada);
+        double intensidade = controleFuzzy.calcular(entradaNormalizada);
         int deslocamento = (int) Math.round(intensidade * distanciaLivre);
 
         return Math.max(1, Math.min(deslocamento, distanciaLivre));

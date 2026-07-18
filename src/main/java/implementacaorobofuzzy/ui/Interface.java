@@ -50,6 +50,13 @@ public class Interface {
                 + ", direita=" + leitura.getDireita()
                 + ", esquerda=" + leitura.getEsquerda()
                 + ", acima=" + leitura.getAcima());
+        System.out.println("  Aberturas visiveis: esquerda="
+                + formataAbertura(leitura.getAberturaEsquerda())
+                + ", direita=" + formataAbertura(leitura.getAberturaDireita()));
         System.out.println("  Direcao escolhida para buscar abertura: " + direcaoBusca);
+    }
+
+    private String formataAbertura(int distancia) {
+        return distancia < 0 ? "nao encontrada" : String.valueOf(distancia);
     }
 }

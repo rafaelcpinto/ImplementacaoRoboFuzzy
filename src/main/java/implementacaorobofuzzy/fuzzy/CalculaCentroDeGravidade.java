@@ -15,9 +15,9 @@ public class CalculaCentroDeGravidade {
     }
 
     private double calculaCentroDeGravidade() {
-        double centroPerto = 0.1667;
+        double centroPerto = 0.1944;
         double centroMedio = 0.50;
-        double centroLonge = 0.8333;
+        double centroLonge = 0.8056;
 
         double numerador = perto * centroPerto
                 + medio * centroMedio

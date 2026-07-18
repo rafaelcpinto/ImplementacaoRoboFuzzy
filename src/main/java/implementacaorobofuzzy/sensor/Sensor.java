@@ -8,13 +8,41 @@ public class Sensor {
         Integer[][] matriz = vizinhanca.getMatriz();
         int centroY = matriz.length / 2;
         int centroX = matriz[centroY].length / 2;
+        int[] aberturas = localizaAberturasNaBarreira(matriz, centroX, centroY);
 
         return new LeituraSensor(
                 distanciaDireita(matriz, centroX, centroY),
                 distanciaEsquerda(matriz, centroX, centroY),
                 distanciaAbaixo(matriz, centroX, centroY),
-                distanciaAcima(matriz, centroX, centroY)
+                distanciaAcima(matriz, centroX, centroY),
+                aberturas[0],
+                aberturas[1]
         );
+    }
+
+    private int[] localizaAberturasNaBarreira(Integer[][] matriz, int centroX, int centroY) {
+        int[] aberturas = {-1, -1};
+        int linhaAbaixo = centroY + 1;
+
+        if (linhaAbaixo >= matriz.length || matriz[linhaAbaixo][centroX] != 1) {
+            return aberturas;
+        }
+
+        for (int distancia = 1; distancia <= centroX; distancia++) {
+            if (matriz[linhaAbaixo][centroX - distancia] != 1) {
+                aberturas[0] = distancia;
+                break;
+            }
+        }
+
+        for (int distancia = 1; centroX + distancia < matriz[linhaAbaixo].length; distancia++) {
+            if (matriz[linhaAbaixo][centroX + distancia] != 1) {
+                aberturas[1] = distancia;
+                break;
+            }
+        }
+
+        return aberturas;
     }
 
     private int distanciaDireita(Integer[][] matriz, int centroX, int centroY) {

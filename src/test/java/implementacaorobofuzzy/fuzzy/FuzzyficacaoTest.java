@@ -1,31 +1,41 @@
 package implementacaorobofuzzy.fuzzy;
 
+import implementacaorobofuzzy.fuzzy.dominio.DataIn;
+import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTrapezoidal;
+import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoTriangular;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FuzzyficacaoTest {
 
-    private final Fuzzyficacao fuzzyficacao = new Fuzzyficacao();
-
     @Test
-    void deveCalcularPerto() {
-        assertEquals(1.0, fuzzyficacao.calcPerto(0), 0.0001);
-        assertEquals(1.0, fuzzyficacao.calcPerto(0.25), 0.0001);
-        assertEquals(0.0, fuzzyficacao.calcPerto(0.50), 0.0001);
-    }
+    void deveCalcularValoresSemConhecerDataIn() {
+        Fuzzyficacao fuzzyficacao = new Fuzzyficacao();
+        DataIn entrada = new DataIn();
+        fuzzyficacao.adicionar(
+                entrada.getPerto().getNome(),
+                new FuncaoTrapezoidal(0.0, 0.0, 0.25, 0.5)
+        );
+        fuzzyficacao.adicionar(
+                entrada.getMedio().getNome(),
+                new FuncaoTriangular(0.25, 0.5, 0.75)
+        );
+        fuzzyficacao.adicionar(
+                entrada.getLonge().getNome(),
+                new FuncaoTrapezoidal(0.5, 0.75, 1.0, 1.0)
+        );
 
-    @Test
-    void deveCalcularMedio() {
-        assertEquals(0.0, fuzzyficacao.calcMedio(0.25), 0.0001);
-        assertEquals(1.0, fuzzyficacao.calcMedio(0.50), 0.0001);
-        assertEquals(0.0, fuzzyficacao.calcMedio(0.75), 0.0001);
-    }
+        Map<String, Double> valores = fuzzyficacao.calcular(0.5);
+        Map<String, Double> centroides = fuzzyficacao.obterCentroides();
 
-    @Test
-    void deveCalcularLonge() {
-        assertEquals(0.0, fuzzyficacao.calcLonge(0.50), 0.0001);
-        assertEquals(1.0, fuzzyficacao.calcLonge(0.75), 0.0001);
-        assertEquals(1.0, fuzzyficacao.calcLonge(1.0), 0.0001);
+        assertEquals(0.0, valores.get("perto"), 0.0001);
+        assertEquals(1.0, valores.get("medio"), 0.0001);
+        assertEquals(0.0, valores.get("longe"), 0.0001);
+        assertEquals(0.5, centroides.get("medio"), 0.0001);
+        assertThrows(IllegalArgumentException.class, () -> fuzzyficacao.calcular(-0.1));
     }
 }

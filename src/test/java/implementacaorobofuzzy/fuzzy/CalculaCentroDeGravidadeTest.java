@@ -2,48 +2,31 @@ package implementacaorobofuzzy.fuzzy;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CalculaCentroDeGravidadeTest {
 
     @Test
-    void deveCalcularCentroDeGravidadeComBuilder() {
-        double centro = CalculaCentroDeGravidade.builder()
-                .perto(0.3)
-                .medio(0.4)
-                .longe(0.0)
-                .getCentroGravidade();
+    void deveCalcularCentroideComListas() {
+        Centroide centroide = new Centroide(Arrays.asList(0.1944, 0.5));
 
-        assertEquals(0.3690285714, centro, 0.0001);
+        assertEquals(
+                0.3690285714,
+                centroide.calcular(Arrays.asList(0.3, 0.4)),
+                0.0001
+        );
     }
 
     @Test
-    void deveCalcularCentroDeGravidadeAposBuild() {
-        double centro = CalculaCentroDeGravidade.builder()
-                .perto(0.3)
-                .medio(0.4)
-                .longe(0.0)
-                .build()
-                .getValue();
+    void deveExigirListasDoMesmoTamanho() {
+        Centroide centroide = new Centroide(Arrays.asList(0.1944, 0.5));
 
-        assertEquals(0.3690285714, centro, 0.0001);
-    }
-
-    @Test
-    void naoDeveAceitarGrauForaDoIntervaloFuzzy() {
-        assertThrows(IllegalArgumentException.class, () -> CalculaCentroDeGravidade.builder().perto(-0.1));
-        assertThrows(IllegalArgumentException.class, () -> CalculaCentroDeGravidade.builder().longe(1.1));
-    }
-
-    @Test
-    void deveRetornarZeroQuandoNaoExistePeso() {
-        double centro = CalculaCentroDeGravidade.builder()
-                .perto(0.0)
-                .medio(0.0)
-                .longe(0.0)
-                .calcular();
-
-        assertEquals(0.0, centro, 0.0001);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> centroide.calcular(Arrays.asList(0.3))
+        );
     }
 }

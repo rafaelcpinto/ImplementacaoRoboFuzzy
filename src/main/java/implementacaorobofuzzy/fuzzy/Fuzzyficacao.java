@@ -1,40 +1,55 @@
 package implementacaorobofuzzy.fuzzy;
 
+import implementacaorobofuzzy.fuzzy.fuzzificacao.functions.FuncaoPertinencia;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
 public class Fuzzyficacao {
 
-    public double calcPerto(double input) {
-        if (input >= 0.0 && input <= 0.25) {
-            return 1.0;
-        }
+    private final Map<String, FuncaoPertinencia> funcoes = new LinkedHashMap<>();
 
-        if (input > 0.25 && input <= 0.50) {
-            return (0.50 - input) / 0.25;
-        }
+    public void adicionar(String nome, FuncaoPertinencia funcao) {
+        validarNome(nome);
+        Objects.requireNonNull(funcao, "A funcao nao pode ser nula.");
 
-        return 0.0;
+        if (funcoes.putIfAbsent(nome, funcao) != null) {
+            throw new IllegalArgumentException("Funcao duplicada: " + nome);
+        }
     }
 
-    public double calcMedio(double input) {
-        if (input >= 0.25 && input <= 0.50) {
-            return (input - 0.25) / 0.25;
+    public Map<String, Double> calcular(double entrada) {
+        validarEntrada(entrada);
+        Map<String, Double> resultados = new LinkedHashMap<>();
+
+        for (Map.Entry<String, FuncaoPertinencia> item : funcoes.entrySet()) {
+            resultados.put(item.getKey(), item.getValue().calcular(entrada));
         }
 
-        if (input > 0.50 && input <= 0.75) {
-            return (0.75 - input) / 0.25;
-        }
-
-        return 0.0;
+        return Collections.unmodifiableMap(resultados);
     }
 
-    public double calcLonge(double input) {
-        if (input >= 0.50 && input < 0.75) {
-            return (input - 0.50) / 0.25;
+    public Map<String, Double> obterCentroides() {
+        Map<String, Double> centroides = new LinkedHashMap<>();
+
+        for (Map.Entry<String, FuncaoPertinencia> item : funcoes.entrySet()) {
+            centroides.put(item.getKey(), item.getValue().getCentroide());
         }
 
-        if (input >= 0.75 && input <= 1.0) {
-            return 1.0;
-        }
+        return Collections.unmodifiableMap(centroides);
+    }
 
-        return 0.0;
+    private void validarNome(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome da funcao nao pode ser vazio.");
+        }
+    }
+
+    private void validarEntrada(double entrada) {
+        if (!Double.isFinite(entrada) || entrada < 0.0 || entrada > 1.0) {
+            throw new IllegalArgumentException("A entrada deve estar entre 0 e 1.");
+        }
     }
 }

@@ -90,7 +90,7 @@ entrada = min(distanciaLivre / 50, 1)
 
 ### Centro de gravidade
 
-`Defuzzyficacao` recebe a inferência agregada e a repassa para `CalculaCentroDeGravidade`, que usa uma média ponderada com os centros:
+Cada função de pertinência calcula seu próprio centroide. `ControleFuzzy` passa os mesmos objetos para `Fuzzyficacao` e repassa seus centroides ao construtor de `Defuzzyficacao`. O método `calcular` recebe os graus agregados e calcula a velocidade final usando a média ponderada:
 
 | Conjunto | Centro |
 | --- | --- |
